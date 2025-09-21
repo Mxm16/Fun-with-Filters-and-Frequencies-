@@ -177,23 +177,45 @@ plt.show()
 </div>
   
 <div class="img-row">
-  <img src="assets/images/mycat.jpg" alt="Original" style="width:220px">
-  <img src="assets/images/mycatgray.jpg" alt="Gray result" style="width:220px">
-  <img src="assets/images/mycatdxdy.png" alt="DxDy result" style="width:220px">
+  <img src="results/mycat.jpg" alt="Original" style="width:220px">
+  <img src="results/mycatgray.png" alt="Gray result" style="width:220px">
+  <img src="results/mycatdxdy.png" alt="DxDy result" style="width:220px">
 </div>
   
 </details>
 
 <h3>1.2 Finite Difference Operator (Dx, Dy)</h3>
-<p>Demonstration: apply difference operators on the classic <em>cameraman</em> (or your own grayscale portrait), show gradient magnitude, and binarize with a threshold to generate an edge map.</p>
+<p>Demonstration: apply difference operators on the classic <em>cameraman</em>, show gradient magnitude, and binarize with a threshold to generate an edge map.</p>
 <div class="img-row">
-  <img src="assets/images/cameraman_gray.png" alt="Original (placeholder)" style="width:220px">
-  <img src="assets/images/cameraman_dx.png" alt="Dx (placeholder)" style="width:220px">
-  <img src="assets/images/cameraman_edges.png" alt="Edges (placeholder)" style="width:220px">
+  <img src="results/cameramandxdy.png" alt="DxDy" style="width:220px">
+  <img src="results/cameramanedges.png" alt="Edges" style="width:220px">
 </div>
 
-<h3>1.3 Derivative of Gaussian (DoG)</h3>
-<p>Smooth the image with a Gaussian, then compute derivatives; or directly convolve Gaussian with Dx/Dy to form DoG filters. Display kernels and results.</p>
+  <h3>1.3 Derivative of Gaussian (DoG) Filter</h3>
+  <p>
+    We noted that the results with just the difference operator were rather noisy. Luckily, we have a smoothing operator handy: the Gaussian filter <code>G</code>. 
+    Create a blurred version of the original image by convolving with a Gaussian and repeat the procedure in the previous part. 
+    One way to create a 2D Gaussian filter is by using a 1D Gaussian (e.g., via <code>cv2.getGaussianKernel()</code>) and taking an outer product with its transpose to get a 2D kernel.
+  </p>
+  
+  <div class="img-row">
+    <img src="results/gaussian_kernel.png" alt="2D Gaussian Kernel" style="width:220px">
+    <img src="results/grad_dxdy.png" alt="Dx, Dy and Gradient magnitude after Gaussian smoothing" style="width:220px">
+  </div>
+
+  <p>
+    Compared with the unsmoothed gradient images, the smoothed gradients are much less noisy: small texture variations are suppressed while main edges become clearer. 
+    Using derivative of Gaussian (DoG) filters combines smoothing and differentiation in a single convolution step.
+  </p>
+
+  <div class="img-row">
+    <img src="results/dog_filter_dxdy.png" alt="DoG filter Dx, Dy" style="width:220px">
+    <img src="results/grad_magnitude_dog.png" alt="Gradient magnitude via DoG" style="width:220px">
+  </div>
+
+  <p>
+    You can verify that applying the DoG filters directly to the original image produces the same results as smoothing first and then computing derivatives.
+  </p>
 </section>
 
 <section id="part2" class="card">
