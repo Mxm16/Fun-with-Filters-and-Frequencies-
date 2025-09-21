@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fun with Filters and Frequencies!</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/modern-normalize/modern-normalize.css">
+<style>
+:root{--accent:#2b6cb0;--bg:#f7fafc;--card:#ffffff;--muted:#6b7280}
+body{font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; background:var(--bg); color:#111; line-height:1.6;}
+.container{max-width:1100px;margin:32px auto;padding:20px}
+header{display:flex;gap:16px;align-items:center}
+header h1{margin:0;font-size:1.6rem}
+.meta{color:var(--muted);font-size:.95rem}
+nav{margin:18px 0}
+nav a{margin-right:12px;color:var(--accent);text-decoration:none}
+.grid{display:grid;grid-template-columns:1fr 320px;gap:20px}
+.card{background:var(--card);padding:16px;border-radius:12px;box-shadow:0 6px 18px rgba(30,41,59,0.06)}
+h2{margin-top:0}
+pre{background:#0b1220;color:#d1e8ff;padding:12px;border-radius:8px;overflow:auto}
+code{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', 'Courier New', monospace}
+.img-row{display:flex;flex-wrap:wrap;gap:8px}
+.img-row img{max-width:100%;height:auto;border-radius:6px;box-shadow:0 6px 18px rgba(2,6,23,0.06)}
+footer{margin-top:28px;color:var(--muted);font-size:.9rem}
+.note{background:#fff7ed;border-left:4px solid #f6ad55;padding:10px;border-radius:6px;color:#92400e}
+
+/* code-box styling */
+.code-box { background: #0b1220; border-radius: 8px; padding: 10px; margin: 10px 0; max-height: 300px; overflow: auto; }
+.code-box pre { margin: 0; }
+
+@media (max-width:900px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+  <div>
+    <h1>Fun with Filters and Frequencies!</h1>
+  </div>
+</header>
+
+<nav>
+  <a href="#part1">Part 1: Filters</a>
+  <a href="#part2">Part 2: Frequencies</a>
+  <a href="#multires">Part 2.3/2.4: Multiresolution Blending</a>
+  <a href="#deliver">Deliverables & Reflection</a>
+</nav>
+
+<div class="grid">
+<main>
+
+<section id="intro" class="card">
+  <h2>Project Overview</h2>
+  <p>This is the project webpage for <strong>CS280A / Project 2</strong>. It includes: convolution from scratch, finite difference operator, derivative of Gaussian (DoG), unsharp masking, hybrid images, and multiresolution blending (Burt & Adelson).</p>
+  <p class="note">Tip: place all your example images in <code>assets/images/</code> with file names matching the placeholders in this page.</p>
+</section>
+
+<section id="part1" class="card">
+<h2>Part 1: Fun with Filters</h2>
+
+<h3>1.1 Convolutions from Scratch</h3>
+<p>First, let's recap what a convolution is. Implement it with four nested loops, then optimize to two loops, and finally compare with the built-in <code>scipy.signal.convolve2d</code>.</p>
+
+<details>
+  <summary>Sample Python code (click to expand)</summary>
+
+  <div class="code-box">
+    <pre><code>import numpy as np
+
+def conv4(image, kernel):
+    Hi, Wi = image.shape
+    Hk, Wk = kernel.shape
+    pad_h, pad_w = Hk // 2, Wk // 2
+    padded = np.pad(image.astype(np.float64), ((pad_h, pad_h), (pad_w, pad_w)), mode='constant')
+    out = np.zeros((Hi, Wi), dtype=np.float64)
+    kernel_flipped = np.flipud(np.fliplr(kernel))
+
+    for i in range(Hi):
+        for j in range(Wi):
+            val = 0.0
+            for m in range(Hk):
+                for n in range(Wk):
+                    val += padded[i+m, j+n] * kernel_flipped[m, n]
+            out[i, j] = val
+    return out
+</code></pre>
+  </div>
+
+  <div class="code-box">
+    <pre><code>def conv2(image, kernel):
+    Hi, Wi = image.shape
+    Hk, Wk = kernel.shape
+    pad_h, pad_w = Hk // 2, Wk // 2
+    padded = np.pad(image.astype(np.float64), ((pad_h, pad_h), (pad_w, pad_w)), mode='constant')
+    out = np.zeros((Hi, Wi), dtype=np.float64)
+    kernel_flipped = np.flipud(np.fliplr(kernel))
+
+    for i in range(Hi):
+        for j in range(Wi):
+            region = padded[i:i+Hk, j:j+Wk]
+            out[i, j] = np.sum(region * kernel_flipped)
+    return out
+</code></pre>
+  </div>
+
+  <div class="code-box">
+    <pre><code>from scipy import signal
+import matplotlib.pyplot as plt
+from skimage import data
+
+img = data.coins()
+kernel = np.array([[1, 0, -1],
+                   [1, 0, -1],
+                   [1, 0, -1]])
+
+out4 = conv4(img, kernel)
+out2 = conv2(img, kernel)
+out_builtin = signal.convolve2d(img, kernel, mode='same')
+
+plt.figure(figsize=(12,4))
+plt.subplot(1,3,1)
+plt.imshow(out4, cmap='gray')
+plt.title("My Conv (4 loops)")
+
+plt.subplot(1,3,2)
+plt.imshow(out2, cmap='gray')
+plt.title("My Conv (2 loops)")
+
+plt.subplot(1,3,3)
+plt.imshow(out_builtin, cmap='gray')
+plt.title("scipy.signal.convolve2d")
+
+plt.show()
+</code></pre>
+  </div>
+  
+<div class="img-row">
+  <img src="results/compare.png" alt="comparison" style="width:220px">
+</div>
+
+  
+<div class="code-box">
+<pre><code>import imageio.v2 as imageio
+from skimage import color
+import matplotlib.pyplot as plt
+import numpy as np
+
+myimg = imageio.imread('myself.jpg')
+mygray = color.rgb2gray(myimg)
+
+# 9x9 Box filter
+box_filter = np.ones((9, 9), dtype=np.float32) / 81.0
+blurred = conv2(mygray, box_filter)
+
+plt.imshow(blurred, cmap='gray')
+plt.title("Box Filter (9x9)")
+plt.show()
+
+# Finite difference operators
+Dx = np.array([[1, -1]], dtype=np.float32)
+Dy = np.array([[1], [-1]], dtype=np.float32)
+
+Ix = conv2(mygray, Dx)
+Iy = conv2(mygray, Dy)
+
+plt.figure(figsize=(10,4))
+plt.subplot(1,2,1)
+plt.imshow(Ix, cmap='gray')
+plt.title("Dx (Horizontal Gradient)")
+
+plt.subplot(1,2,2)
+plt.imshow(Iy, cmap='gray')
+plt.title("Dy (Vertical Gradient)")
+
+plt.show()
+</code></pre>
+</div>
+  
+<div class="img-row">
+  <img src="assets/images/mycat.jpg" alt="Original" style="width:220px">
+  <img src="assets/images/mycatgray.jpg" alt="Gray result" style="width:220px">
+  <img src="assets/images/mycatdxdy.png" alt="DxDy result" style="width:220px">
+</div>
+  
+</details>
+
+<h3>1.2 Finite Difference Operator (Dx, Dy)</h3>
+<p>Demonstration: apply difference operators on the classic <em>cameraman</em> (or your own grayscale portrait), show gradient magnitude, and binarize with a threshold to generate an edge map.</p>
+<div class="img-row">
+  <img src="assets/images/cameraman_gray.png" alt="Original (placeholder)" style="width:220px">
+  <img src="assets/images/cameraman_dx.png" alt="Dx (placeholder)" style="width:220px">
+  <img src="assets/images/cameraman_edges.png" alt="Edges (placeholder)" style="width:220px">
+</div>
+
+<h3>1.3 Derivative of Gaussian (DoG)</h3>
+<p>Smooth the image with a Gaussian, then compute derivatives; or directly convolve Gaussian with Dx/Dy to form DoG filters. Display kernels and results.</p>
+</section>
+
+<section id="part2" class="card">
+<h2>Part 2: Fun with Frequencies</h2>
+
+<h3>2.1 Image Sharpening (Unsharp Masking)</h3>
+<p>Description: <code>sharpened = original + α * (original - blurred)</code>. Show: original blurry image, blurred version, sharpened result, and side-by-side comparisons.</p>
+<div class="img-row">
+  <img src="assets/images/taj_original.jpg" alt="taj original (placeholder)" style="width:300px">
+  <img src="assets/images/taj_sharpened.jpg" alt="taj sharpened (placeholder)" style="width:300px">
+</div>
+
+<h3>2.2 Hybrid Images</h3>
+<p>Process: keep high frequencies of image A (original - gaussian(A)), low frequencies of image B (gaussian(B)), and add them together. Also show Fourier spectra of inputs, filtered versions, and final hybrid image.</p>
+<div class="img-row">
+  <img src="assets/images/hybrid_close.png" alt="Hybrid (close view placeholder)" style="width:260px">
+  <img src="assets/images/hybrid_far.png" alt="Hybrid (far view placeholder)" style="width:260px">
+</div>
+</section>
+
+<section id="multires" class="card">
+<h2>Part 2.3/2.4: Gaussian & Laplacian Stacks + Multiresolution Blending</h2>
+<p>Implement <strong>stacks (no downsampling)</strong> for Gaussian and Laplacian. Use a Gaussian stack of the mask for blending. Reproduce the classic “oraple” (half apple, half orange).</p>
+
+<details>
+  <summary>Core pseudo-code</summary>
+  <pre><code># Gaussian stack
+G[0] = img
+for i in 1..N:
+    G[i] = gaussian_filter(G[i-1], sigma_i)
+
+# Laplacian stack
+L[i] = G[i] - G[i+1]
+L[N] = G[N]
+
+# Blending with mask
+for each level:
+   blended = mask_gauss[level] * L1[level] + (1-mask_gauss[level]) * L2[level]
+Reconstruct by summing blended levels
+</code></pre>
+</details>
+
+<div class="img-row">
+  <img src="assets/images/oraple_input.png" alt="apple/orange inputs (placeholder)" style="width:260px">
+  <img src="assets/images/oraple_result.png" alt="oraple result (placeholder)" style="width:260px">
+</div>
+</section>
+
+<section id="deliver" class="card">
+<h2>Deliverables & Reflection</h2>
+<ol>
+  <li>Source code: push <code>src/</code> folder (Python scripts, notebooks, utilities) to your GitHub repository.</li>
+  <li>Webpage: commit this HTML (and assets) to your repo and enable GitHub Pages (branch: <code>main</code> or <code>gh-pages</code>).</li>
+  <li>Class gallery: submit the project webpage URL to the course Google Form.</li>
+</ol>
+<h3>Most Important Thing I Learned</h3>
+<p>(Write 2–3 sentences here, e.g., about the complementarity of spatial vs. frequency domain filtering, or how mask smoothing determines seam quality in blending.)</p>
+</section>
+
+</main>
+
+<aside>
+<div class="card">
+<h3>Instructions</h3>
+<ul>
+  <li>Place images in <code>assets/images/</code> with names matching this page.</li>
+  <li>Use <code>&lt;pre&gt;&lt;code&gt;</code> blocks for code display. You may add syntax highlighting via Prism.js (CDN).</li>
+  <li>Export result images at 600–900 px width (under 0.8 MB each).</li>
+</ul>
+</div>
+
+<div class="card">
+<h3>Need Help?</h3>
+<p>I can help you:</p>
+<ul>
+  <li>Insert your actual images and adjust layout.</li>
+  <li>Convert code blocks into Notebook/Colab templates.</li>
+  <li>Bundle README + webpage and provide git push commands.</li>
+</ul>
+</div>
+
+<div class="card">
+<h4>Quick GitHub Push Example</h4>
+<pre><code>git init
+git add .
+git commit -m "Add project2 webpage"
+git remote add origin git@github.com:yourusername/yourrepo.git
+git push -u origin main
+</code></pre>
+</div>
+</aside>
+</div>
+
+<footer>
+<p>If you want: 1) me to insert your images and fine-tune styles; 2) turn this into a Jekyll site or automate builds with CI — let me know and I’ll update it.</p>
+</footer>
+</div>
+</body>
+</html>
