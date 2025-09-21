@@ -19,8 +19,8 @@ nav a{margin-right:12px;color:var(--accent);text-decoration:none}
 h2{margin-top:0}
 pre{background:#0b1220;color:#d1e8ff;padding:12px;border-radius:8px;overflow:auto}
 code{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', 'Courier New', monospace}
-.img-row{display:flex;flex-wrap:wrap;gap:8px}
-.img-row img{max-width:100%;height:auto;border-radius:6px;box-shadow:0 6px 18px rgba(2,6,23,0.06)}
+.img-row {display: flex;flex-wrap: wrap;gap: 10px;justify-content: flex-start;}
+.img-row img {max-width: 300px;width: auto;height: auto;border-radius: 6px;box-shadow: 0 6px 18px rgba(2,6,23,0.06);}
 footer{margin-top:28px;color:var(--muted);font-size:.9rem}
 .note{background:#fff7ed;border-left:4px solid #f6ad55;padding:10px;border-radius:6px;color:#92400e}
 
@@ -58,81 +58,151 @@ footer{margin-top:28px;color:var(--muted);font-size:.9rem}
 <section id="part1" class="card">
   <h2>Part 1: Fun with Filters</h2>
 
+  <!-- 1.1 Convolutions from Scratch -->
   <h3>1.1 Convolutions from Scratch</h3>
-  <p>
-    First, let's recap what a convolution is. Implement it with four nested loops, then optimize to two loops, 
-    and finally compare with the built-in <code>scipy.signal.convolve2d</code>.
-  </p>
+  <p>First, let's recap what a convolution is. Implement it with four nested loops, then optimize to two loops, and finally compare with the built-in <code>scipy.signal.convolve2d</code>.</p>
 
   <div class="code-box">
-    <pre><code>import numpy as np
-def conv4(image, kernel):
-    ...
-def conv2(image, kernel):
-    ...
+  <pre><code>import numpy as np
 from scipy import signal
 import matplotlib.pyplot as plt
 from skimage import data
-...
+
+# Four-loop convolution
+def conv4(image, kernel):
+    Hi, Wi = image.shape
+    Hk, Wk = kernel.shape
+    pad_h, pad_w = Hk//2, Wk//2
+    padded = np.pad(image.astype(np.float64), ((pad_h, pad_h), (pad_w, pad_w)), 'constant')
+    out = np.zeros((Hi, Wi), dtype=np.float64)
+    kernel_flipped = np.flipud(np.fliplr(kernel))
+    for i in range(Hi):
+        for j in range(Wi):
+            val = 0.0
+            for m in range(Hk):
+                for n in range(Wk):
+                    val += padded[i+m, j+n] * kernel_flipped[m, n]
+            out[i,j] = val
+    return out
+
+# Two-loop convolution
+def conv2(image, kernel):
+    Hi, Wi = image.shape
+    Hk, Wk = kernel.shape
+    pad_h, pad_w = Hk//2, Wk//2
+    padded = np.pad(image.astype(np.float64), ((pad_h,pad_h),(pad_w,pad_w)), 'constant')
+    out = np.zeros((Hi, Wi), dtype=np.float64)
+    kernel_flipped = np.flipud(np.fliplr(kernel))
+    for i in range(Hi):
+        for j in range(Wi):
+            region = padded[i:i+Hk, j:j+Wk]
+            out[i,j] = np.sum(region * kernel_flipped)
+    return out
+
+# Example image
+img = data.coins()
+kernel = np.array([[1,0,-1],[1,0,-1],[1,0,-1]])
+
+out4 = conv4(img, kernel)
+out2 = conv2(img, kernel)
+out_builtin = signal.convolve2d(img, kernel, mode='same')
+
+plt.figure(figsize=(12,4))
+plt.subplot(1,3,1)
+plt.imshow(out4, cmap='gray')
+plt.title("My Conv (4 loops)")
+
+plt.subplot(1,3,2)
+plt.imshow(out2, cmap='gray')
+plt.title("My Conv (2 loops)")
+
+plt.subplot(1,3,3)
+plt.imshow(out_builtin, cmap='gray')
+plt.title("scipy.signal.convolve2d")
+
+plt.show()
 </code></pre>
   </div>
 
   <div class="img-row">
-    <img src="results/compare.png" alt="Comparison of conv4, conv2, built-in" style="width:33%">
+    <img src="results/compare.png" alt="Comparison conv4 vs conv2 vs builtin">
   </div>
 
-  <p>
-    Next, take a picture of yourself, convert it to grayscale, and apply a 9x9 box filter, as well as Dx and Dy finite difference operators.
-  </p>
-
+  <!-- Box filter and finite differences -->
   <div class="code-box">
-    <pre><code>import imageio.v2 as imageio
+  <pre><code>import imageio.v2 as imageio
 from skimage import color
 import numpy as np
-...
+import matplotlib.pyplot as plt
+
+myimg = imageio.imread('myself.jpg')
+mygray = color.rgb2gray(myimg)
+
+# 9x9 Box filter
+box_filter = np.ones((9,9), dtype=np.float32)/81.0
+blurred = conv2(mygray, box_filter)
+plt.imshow(blurred, cmap='gray')
+plt.title("Box Filter (9x9)")
+plt.show()
+
+# Finite difference operators
+Dx = np.array([[1,-1]], dtype=np.float32)
+Dy = np.array([[1],[ -1]], dtype=np.float32)
+
+Ix = conv2(mygray, Dx)
+Iy = conv2(mygray, Dy)
+
+plt.figure(figsize=(10,4))
+plt.subplot(1,2,1)
+plt.imshow(Ix, cmap='gray')
+plt.title("Dx (Horizontal Gradient)")
+
+plt.subplot(1,2,2)
+plt.imshow(Iy, cmap='gray')
+plt.title("Dy (Vertical Gradient)")
+plt.show()
 </code></pre>
   </div>
 
   <div class="img-row">
-    <img src="results/mycat.jpg" alt="Original image" style="width:30%">
-    <img src="results/mycatgray.png" alt="Grayscale" style="width:30%">
-    <img src="results/mycatdxdy.png" alt="Dx & Dy result" style="width:30%">
+    <img src="results/mycat.jpg" alt="Original">
+    <img src="results/mycatgray.png" alt="Gray">
+    <img src="results/mycatdxdy.png" alt="DxDy">
   </div>
 
+  <!-- 1.2 Finite Difference Operator -->
   <h3>1.2 Finite Difference Operator (Dx, Dy)</h3>
-  <p>
-    Apply difference operators on the classic <em>cameraman</em>, compute the gradient magnitude, 
-    and binarize with a threshold to generate an edge map.
-  </p>
-
+  <p>Demonstration: apply difference operators on the classic <em>cameraman</em>, show gradient magnitude, and binarize with a threshold to generate an edge map.</p>
   <div class="img-row">
-    <img src="results/cameramandxdy.png" alt="DxDy" style="width:48%">
-    <img src="results/cameramanedges.png" alt="Edge map" style="width:48%">
+    <img src="results/cameramandxdy.png" alt="DxDy">
+    <img src="results/cameramanedges.png" alt="Edges">
   </div>
 
+  <!-- 1.3 Derivative of Gaussian -->
   <h3>1.3 Derivative of Gaussian (DoG) Filter</h3>
   <p>
-    The unsmoothed gradient images are noisy. Using a Gaussian filter <code>G</code>, we can smooth the image before applying finite differences.
-    One way to create a 2D Gaussian is by taking the outer product of a 1D Gaussian with its transpose (e.g., via <code>cv2.getGaussianKernel()</code>).
+    We noted that the results with just the difference operator were rather noisy. Luckily, we have a smoothing operator handy: the Gaussian filter <code>G</code>. 
+    Create a blurred version of the original image by convolving with a Gaussian and repeat the procedure in the previous part. 
+    One way to create a 2D Gaussian filter is by using a 1D Gaussian (e.g., via <code>cv2.getGaussianKernel()</code>) and taking an outer product with its transpose to get a 2D kernel.
   </p>
 
   <div class="img-row">
-    <img src="results/gaussian_kernel.png" alt="2D Gaussian Kernel" style="width:33%">
-    <img src="results/grad_dxdy.png" alt="Dx, Dy and Gradient magnitude after Gaussian smoothing" style="width:33%">
+    <img src="results/gaussian_kernel.png" alt="2D Gaussian Kernel">
+    <img src="results/grad_dxdy.png" alt="Dx, Dy and Gradient magnitude after Gaussian smoothing">
   </div>
 
   <p>
-    Compared with unsmoothed gradients, these smoothed gradients are less noisy: small texture variations are suppressed while main edges become clearer. 
-    Derivative of Gaussian (DoG) filters combine smoothing and differentiation in a single convolution step.
+    Compared with the unsmoothed gradient images, the smoothed gradients are much less noisy: small texture variations are suppressed while main edges become clearer. 
+    Using derivative of Gaussian (DoG) filters combines smoothing and differentiation in a single convolution step.
   </p>
 
   <div class="img-row">
-    <img src="results/dog_filter_dxdy.png" alt="DoG filter Dx & Dy" style="width:33%">
-    <img src="results/grad_magnitude_dog.png" alt="Gradient magnitude via DoG" style="width:33%">
+    <img src="results/dog_filter_dxdy.png" alt="DoG filter Dx, Dy">
+    <img src="results/grad_magnitude_dog.png" alt="Gradient magnitude via DoG">
   </div>
 
   <p>
-    Applying the DoG filters directly to the original image produces the same result as smoothing first and then computing derivatives.
+    You can verify that applying the DoG filters directly to the original image produces the same results as smoothing first and then computing derivatives.
   </p>
 </section>
 
