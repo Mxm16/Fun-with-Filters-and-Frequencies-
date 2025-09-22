@@ -269,12 +269,17 @@ I also created multiple hybrid examples (e.g., change of expression, my cat grow
 </div>
 
 <section id="multires" class="card">
-<h2>Part 2.3/2.4: Gaussian & Laplacian Stacks + Multiresolution Blending</h2>
-<p>Implement <strong>stacks (no downsampling)</strong> for Gaussian and Laplacian. Use a Gaussian stack of the mask for blending. Reproduce the classic “oraple” (half apple, half orange).</p>
+  <h2>Part 2.3/2.4: Gaussian & Laplacian Stacks + Multiresolution Blending</h2>
+  <p>Implement <strong>stacks (no downsampling)</strong> for Gaussian and Laplacian. Use a Gaussian stack of the mask for blending. Reproduce the classic “oraple” (half apple, half orange) and experiment with vertical/horizontal seams and irregular masks.</p>
 
-<details>
-  <summary>Core pseudo-code</summary>
-  <pre><code># Gaussian stack
+  <h3>Gaussian & Laplacian Stacks (no downsampling)</h3>
+  <p>
+    A <strong>stack</strong> is similar to a pyramid but every level has the same spatial size as the original image; only the amount of Gaussian smoothing increases at each level. To build a Gaussian stack, repeatedly blur the image (increasing the effective sigma each level) and store each blurred image. The Laplacian stack is formed by taking the difference between successive Gaussian levels (L[i] = G[i] - G[i+1]) with the last level equal to G[N].
+  </p>
+
+  <details>
+    <summary>Core pseudo-code</summary>
+    <pre><code># Gaussian stack
 G[0] = img
 for i in 1..N:
     G[i] = gaussian_filter(G[i-1], sigma_i)
@@ -288,62 +293,47 @@ for each level:
    blended = mask_gauss[level] * L1[level] + (1-mask_gauss[level]) * L2[level]
 Reconstruct by summing blended levels
 </code></pre>
-</details>
+  </details>
 
-<div class="img-row">
-  <img src="assets/images/oraple_input.png" alt="apple/orange inputs (placeholder)" style="width:260px">
-  <img src="assets/images/oraple_result.png" alt="oraple result (placeholder)" style="width:260px">
-</div>
-</section>
+  <h3>Multiresolution Blending (the Oraple)</h3>
+  <p>
+    Use a mask (step function for a straight seam, or an irregular mask for creative blends). Build a Gaussian stack for the mask as well; this smooths the seam differently at each frequency band and prevents visible seams when you reconstruct the image from the blended Laplacian stack.
+  </p>
 
-<section id="deliver" class="card">
-<h2>Deliverables & Reflection</h2>
-<ol>
-  <li>Source code: push <code>src/</code> folder (Python scripts, notebooks, utilities) to your GitHub repository.</li>
-  <li>Webpage: commit this HTML (and assets) to your repo and enable GitHub Pages (branch: <code>main</code> or <code>gh-pages</code>).</li>
-  <li>Class gallery: submit the project webpage URL to the course Google Form.</li>
-</ol>
-<h3>Most Important Thing I Learned</h3>
-<p>(Write 2–3 sentences here, e.g., about the complementarity of spatial vs. frequency domain filtering, or how mask smoothing determines seam quality in blending.)</p>
+  <p>Workflow summary:</p>
+  <ol>
+    <li>Read and (optionally) align / resize both images to the same dimensions.</li>
+    <li>Build Gaussian stacks for image A, image B, and the mask.</li>
+    <li>Form Laplacian stacks for A and B by subtracting successive Gaussian levels.</li>
+    <li>At each level, blend Laplacian bands using the Gaussian-smoothed mask.</li>
+    <li>Reconstruct the final image by summing blended Laplacian levels from coarse to fine.</li>
+  </ol>
+
+  <div class="img-row">
+    <img src="results/orange.png" alt="apple/orange inputs & oraple result(placeholder)" style="max-width:90%">
+  </div>
+
+
+  <p>Below are example results: the input pair, the blended result, and a visualization of Laplacian bands for the chosen levels.</p>
+
+  <div class="img-row">
+    <figure>
+      <img src="results/flowerman.png" alt="blending flowers with dresses" style="max-width:90%">
+      <figcaption>Horizontal seam blending: flower head smoothly merged with a dress.</figcaption>
+    </figure>
+    <figure>
+      <img src="results/images/starhill.png" alt="Blending van Gogh's paintings with hills" style="max-width:90%">
+      <figcaption>Diagonal seam blending: van Gogh's starry sky gradually transitions into hills.</figcaption>
+    </figure>
+    <figure>
+      <img src="results/images/eyeflower.png" alt="Blending sunflower with an eye" style="max-width:90%">
+      <figcaption>Irregular (circular) mask blending: an eye embedded inside a sunflower.</figcaption>
+    </figure>
+  </div>
 </section>
 
 </main>
-
-<aside>
-<div class="card">
-<h3>Instructions</h3>
-<ul>
-  <li>Place images in <code>assets/images/</code> with names matching this page.</li>
-  <li>Use <code>&lt;pre&gt;&lt;code&gt;</code> blocks for code display. You may add syntax highlighting via Prism.js (CDN).</li>
-  <li>Export result images at 600–900 px width (under 0.8 MB each).</li>
-</ul>
 </div>
-
-<div class="card">
-<h3>Need Help?</h3>
-<p>I can help you:</p>
-<ul>
-  <li>Insert your actual images and adjust layout.</li>
-  <li>Convert code blocks into Notebook/Colab templates.</li>
-  <li>Bundle README + webpage and provide git push commands.</li>
-</ul>
-</div>
-
-<div class="card">
-<h4>Quick GitHub Push Example</h4>
-<pre><code>git init
-git add .
-git commit -m "Add project2 webpage"
-git remote add origin git@github.com:yourusername/yourrepo.git
-git push -u origin main
-</code></pre>
-</div>
-</aside>
-</div>
-
-<footer>
-<p>If you want: 1) me to insert your images and fine-tune styles; 2) turn this into a Jekyll site or automate builds with CI — let me know and I’ll update it.</p>
-</footer>
 </div>
 </body>
 </html>
