@@ -143,12 +143,15 @@
         <section id="part1" class="card">
           <h2>Part 1: Fun with Filters</h2>
 
-          <!-- 1.1 Convolutions from Scratch -->
-          <h3>1.1 Convolutions from Scratch</h3>
-          <p>First, let's recap what a convolution is. Implement it with four nested loops, then optimize to two loops, and finally compare with the built-in <code>scipy.signal.convolve2d</code>.</p>
+<!-- 1.1 Convolutions from Scratch -->
+<h3>1.1 Convolutions from Scratch</h3>
+<p>
+  First, let's recap what a convolution is. Implement it with four nested loops, then optimize to two loops, 
+  and finally compare with the built-in <code>scipy.signal.convolve2d</code>.
+</p>
 
-          <div class="code-box">
-            <pre><code>import numpy as np
+<div class="code-box">
+<pre><code>import numpy as np
 from scipy import signal
 import matplotlib.pyplot as plt
 from skimage import data
@@ -158,6 +161,7 @@ def conv4(image, kernel):
     Hi, Wi = image.shape
     Hk, Wk = kernel.shape
     pad_h, pad_w = Hk//2, Wk//2
+    # Zero-padding: pad with 0 around the border
     padded = np.pad(image.astype(np.float64), ((pad_h, pad_h), (pad_w, pad_w)), 'constant')
     out = np.zeros((Hi, Wi), dtype=np.float64)
     kernel_flipped = np.flipud(np.fliplr(kernel))
@@ -207,16 +211,49 @@ plt.title("scipy.signal.convolve2d")
 
 plt.show()
 </code></pre>
-          </div>
+</div>
 
-          <div class="img-row">
-            <img src="results/compare.png" alt="Comparison conv4 vs conv2 vs builtin" style="max-width: 90%;" />
-          </div>
+<div class="img-row">
+  <img src="results/compare.png" alt="Comparison conv4 vs conv2 vs builtin" style="max-width: 90%;" />
+</div>
 
-          <p>Then, this is a picture of my cat Coconut(and read as grayscale), and convolved with the box filter. Do it with the finite difference operators Dx and Dy as well.</p>
+<!-- Padding explanation -->
+<p>
+  <b>Padding Strategy:</b> To preserve the output size, we use <b>zero-padding</b>, i.e., padding the input image with 
+  zeros around the border. When the convolution kernel extends beyond the edge of the image, the out-of-bound 
+  pixels are treated as 0. This ensures that the output has the same dimensions as the original input.
+</p>
 
-          <div class="code-box">
-            <pre><code>import imageio.v2 as imageio
+<!-- Runtime comparison -->
+<div class="code-box">
+<pre><code>import time
+t0 = time.perf_counter(); out4 = conv4(img, kernel); t4 = time.perf_counter()-t0
+t0 = time.perf_counter(); out2 = conv2(img, kernel); t2 = time.perf_counter()-t0
+t0 = time.perf_counter(); outb = signal.convolve2d(img, kernel, mode='same'); tb = time.perf_counter()-t0
+print(f"conv4: {t4:.3f}s, conv2: {t2:.3f}s, builtin: {tb:.3f}s")
+</code></pre>
+</div>
+
+<table>
+  <tr><th>Method</th><th>Runtime (s)</th></tr>
+  <tr><td>conv4 (4 loops)</td><td>0.467</td></tr>
+  <tr><td>conv2 (2 loops)</td><td>0.715</td></tr>
+  <tr><td>builtin (SciPy)</td><td>0.005</td></tr>
+</table>
+
+<p>
+  <b>Analysis:</b> The built-in SciPy function is by far the fastest, since it is implemented in optimized C code. 
+  The four-loop version is faster than the two-loop one in this specific case due to Python overhead and the way 
+  slicing works, but in general, reducing the number of loops and leveraging vectorized operations tends to improve speed. 
+</p>
+
+<p>
+  Then, this is a picture of my cat Coconut (read as grayscale), and convolved with the box filter. 
+  We also apply the finite difference operators Dx and Dy.
+</p>
+
+<div class="code-box">
+<pre><code>import imageio.v2 as imageio
 from skimage import color
 import numpy as np
 import matplotlib.pyplot as plt
@@ -248,15 +285,15 @@ plt.imshow(Iy, cmap='gray')
 plt.title("Dy (Vertical Gradient)")
 plt.show()
 </code></pre>
-          </div>
+</div>
 
-          <div class="img-row">
-            <img src="results/mycat.jpg" alt="Original" />
-          </div>
-          <div class="img-row">
-            <img src="results/mycatgray.png" alt="Gray" />
-            <img src="results/mycatdxdy.png" alt="DxDy" style="max-width: 100%;" />
-          </div>
+<div class="img-row">
+  <img src="results/mycat.jpg" alt="Original" />
+</div>
+<div class="img-row">
+  <img src="results/mycatgray.png" alt="Gray" />
+  <img src="results/mycatdxdy.png" alt="DxDy" style="max-width: 100%;" />
+</div>
 
           <!-- 1.2 -->
           <h3>1.2 Finite Difference Operator (Dx, Dy)</h3>
