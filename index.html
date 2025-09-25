@@ -295,17 +295,42 @@ plt.show()
   <img src="results/mycatdxdy.png" alt="DxDy" style="max-width: 100%;" />
 </div>
 
+
+          
           <!-- 1.2 -->
-          <h3>1.2 Finite Difference Operator (Dx, Dy)</h3>
-          <p>Demonstration: apply difference operators on the classic <em>cameraman</em>, show gradient magnitude, and binarize with a threshold(=0.2) to generate an edge map.</p>
+<h3>1.2 Finite Difference Operator (Dx, Dy)</h3>
+<p>
+  We apply finite difference operators <em>Dx</em> and <em>Dy</em> on the classic
+  <em>cameraman</em> image to compute partial derivatives, then combine them to obtain
+  the gradient magnitude. Finally, we binarize the gradient magnitude with different thresholds
+  to visualize edges.
+</p>
 
-          <div class="img-row">
-            <img src="results/cameramandxdy.png" alt="DxDy" style="max-width: 90%;" />
-          </div>
-          <div class="img-row">
-            <img src="results/cameramanedges.png" alt="Edges" />
-          </div>
+<div class="img-row">
+  <img src="results/cameramandxdy.png" alt="DxDy (horizontal and vertical derivatives)" style="max-width: 90%;" />
+</div>
 
+<p>
+  Below are the gradient magnitude images binarized with several thresholds. A smaller threshold
+  preserves more edges but also more noise; a larger threshold removes noise but may lose fine edges.
+</p>
+
+<div class="img-row">
+  <img src="results/cameramanedges1.png" alt="Edges threshold=0.1" />
+  <img src="results/cameramanedges.png" alt="Edges threshold=0.2" />
+  <img src="results/cameramanedges3.png" alt="Edges threshold=0.3" />
+</div>
+
+<p>
+  In this project, we chose <strong>threshold=0.2</strong> as a balance: it removes most small noise
+  while keeping the main structures (such as the outline of the cameraman and tripod).
+</p>
+
+<div class="img-row">
+  <img src="results/cameramanedges.png" alt="Final edge map (threshold=0.2)" />
+</div>
+
+          
           <!-- 1.3 -->
           <h3>1.3 Derivative of Gaussian (DoG) Filter</h3>
           <p>
