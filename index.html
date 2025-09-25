@@ -361,10 +361,10 @@ In summary, Gaussian smoothing significantly reduces noise compared with the sim
         <section id="part2" class="card">
           <h2>Part 2: Fun with Frequencies</h2>
 
-          <h3>2.1 Image Sharpening (Unsharp Masking)</h3>
-          <p>We apply unsharp masking, which can be expressed as:</p>
-          <p><code>sharpened = original + α * (original - blurred)</code></p>
-          <p>A Gaussian filter produces the blurred version. Subtracting it from the original extracts high frequencies. By adding these back, scaled by α, the image becomes sharper. Below we compare the results:</p>
+<h3>2.1 Image Sharpening (Unsharp Masking)</h3>
+<p>We apply unsharp masking, expressed as:</p>
+<p><code>sharpened = original + α * (original - blurred)</code></p>
+<p>A Gaussian filter produces the blurred version. Subtracting it from the original extracts high frequencies, which are then scaled by α and added back to enhance edges and details. Below we show the comparison for the Taj Mahal image:</p>
 
           <div class="img-row">
             <img src="results/taj.png" alt="Taj" style="max-width: 90%;" />
@@ -376,8 +376,10 @@ In summary, Gaussian smoothing significantly reduces noise compared with the sim
             <img src="results/mycat1.png" alt="My Cat Coconut" style="max-width: 90%;" />
           </div>
 
-          <p><b>Observations:</b> The sharpened images show clearer edges and textures, though excessive α can introduce artifacts.</p>
+<p><b>Observations:</b> The sharpened images show clearer edges and textures. Increasing α enhances sharpness but too large a value may introduce visible artifacts or unnatural contrast.</p>
 
+
+          
           <h3>2.2 Hybrid Images</h3>
           <p>The idea of hybrid images is to combine the low-frequency (blurred) part of one image with the high-frequency (edge/detail) part of another. At close viewing distance, the high frequencies dominate perception, so you mainly see image A. From far away, the high frequencies fade, and the low frequencies dominate, so you perceive image B.</p>
 
