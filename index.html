@@ -1,10 +1,10 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Fun with Filters and Frequencies!</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/modern-normalize/modern-normalize.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/modern-normalize/modern-normalize.css" />
   <style>
     :root {
       --accent: #2b6cb0;
@@ -18,6 +18,8 @@
       background: var(--bg);
       color: #111;
       line-height: 1.6;
+      margin: 0;
+      padding: 0;
     }
 
     .container {
@@ -37,11 +39,6 @@
       font-size: 1.6rem;
     }
 
-    .meta {
-      color: var(--muted);
-      font-size: .95rem;
-    }
-
     nav {
       margin: 18px 0;
     }
@@ -54,7 +51,7 @@
 
     .grid {
       display: grid;
-      grid-template-columns: 1fr 320px;
+      grid-template-columns: 1fr;
       gap: 20px;
     }
 
@@ -96,12 +93,6 @@
       box-shadow: 0 6px 18px rgba(2,6,23,0.06);
     }
 
-    footer {
-      margin-top: 28px;
-      color: var(--muted);
-      font-size: .9rem;
-    }
-
     .note {
       background: #fff7ed;
       border-left: 4px solid #f6ad55;
@@ -110,13 +101,12 @@
       color: #92400e;
     }
 
-    /* code-box styling */
     .code-box {
       background: #0b1220;
       border-radius: 8px;
       padding: 10px;
       margin: 10px 0;
-      max-height: 300px;
+      max-height: 360px;
       overflow: auto;
     }
 
@@ -125,8 +115,8 @@
     }
 
     @media (max-width: 900px) {
-      .grid {
-        grid-template-columns: 1fr;
+      .container {
+        padding: 12px;
       }
     }
   </style>
@@ -136,6 +126,7 @@
     <header>
       <div>
         <h1>Fun with Filters and Frequencies!</h1>
+        <div class="meta">Programming Project #2 — CS180</div>
       </div>
     </header>
 
@@ -147,17 +138,14 @@
 
     <div class="grid">
       <main>
+
         <!-- Part 1 -->
         <section id="part1" class="card">
           <h2>Part 1: Fun with Filters</h2>
 
           <!-- 1.1 Convolutions from Scratch -->
           <h3>1.1 Convolutions from Scratch</h3>
-          <p>
-            First, let's recap what a convolution is. Implement it with four nested loops, 
-            then optimize to two loops, and finally compare with the built-in 
-            <code>scipy.signal.convolve2d</code>.
-          </p>
+          <p>First, let's recap what a convolution is. Implement it with four nested loops, then optimize to two loops, and finally compare with the built-in <code>scipy.signal.convolve2d</code>.</p>
 
           <div class="code-box">
             <pre><code>import numpy as np
@@ -222,13 +210,10 @@ plt.show()
           </div>
 
           <div class="img-row">
-            <img src="results/compare.png" alt="Comparison conv4 vs conv2 vs builtin" style="max-width: 90%;">
+            <img src="results/compare.png" alt="Comparison conv4 vs conv2 vs builtin" style="max-width: 90%;" />
           </div>
 
-          <p>
-            Then, this is a picture of my cat Coconut(and read as grayscale), and convolved 
-            with the box filter. Do it with the finite difference operators Dx and Dy as well.
-          </p>
+          <p>Then, this is a picture of my cat Coconut(and read as grayscale), and convolved with the box filter. Do it with the finite difference operators Dx and Dy as well.</p>
 
           <div class="code-box">
             <pre><code>import imageio.v2 as imageio
@@ -266,63 +251,49 @@ plt.show()
           </div>
 
           <div class="img-row">
-            <img src="results/mycat.jpg" alt="Original">
+            <img src="results/mycat.jpg" alt="Original" />
           </div>
           <div class="img-row">
-            <img src="results/mycatgray.png" alt="Gray">
-            <img src="results/mycatdxdy.png" alt="DxDy" style="max-width: 100%;">
+            <img src="results/mycatgray.png" alt="Gray" />
+            <img src="results/mycatdxdy.png" alt="DxDy" style="max-width: 100%;" />
           </div>
 
-          <!-- 1.2 Finite Difference Operator -->
+          <!-- 1.2 -->
           <h3>1.2 Finite Difference Operator (Dx, Dy)</h3>
-          <p>
-            Demonstration: apply difference operators on the classic <em>cameraman</em>, 
-            show gradient magnitude, and binarize with a threshold(=0.2) to generate an edge map.
-          </p>
+          <p>Demonstration: apply difference operators on the classic <em>cameraman</em>, show gradient magnitude, and binarize with a threshold(=0.2) to generate an edge map.</p>
 
           <div class="img-row">
-            <img src="results/cameramandxdy.png" alt="DxDy" style="max-width: 90%;">
+            <img src="results/cameramandxdy.png" alt="DxDy" style="max-width: 90%;" />
           </div>
           <div class="img-row">
-            <img src="results/cameramanedges.png" alt="Edges">
+            <img src="results/cameramanedges.png" alt="Edges" />
           </div>
 
-          <!-- 1.3 Derivative of Gaussian -->
+          <!-- 1.3 -->
           <h3>1.3 Derivative of Gaussian (DoG) Filter</h3>
           <p>
-            We noted that the results with just the difference operator were rather noisy. Luckily, 
-            we have a smoothing operator handy: the Gaussian filter <code>G</code>. 
-            Create a blurred version of the original image by convolving with a Gaussian and repeat 
-            the procedure in the previous part. One way to create a 2D Gaussian filter is by using a 
-            1D Gaussian (e.g., via <code>cv2.getGaussianKernel()</code>) and taking an outer product 
-            with its transpose to get a 2D kernel.
+            We noted that the results with just the difference operator were rather noisy. Luckily, we have a smoothing operator handy: the Gaussian filter <code>G</code>. Create a blurred version of the original image by convolving with a Gaussian and repeat the procedure in the previous part. One way to create a 2D Gaussian filter is by using a 1D Gaussian (e.g., via <code>cv2.getGaussianKernel()</code>) and taking an outer product with its transpose to get a 2D kernel.
           </p>
 
           <div class="img-row">
-            <img src="results/gaussian_kernel.png" alt="2D Gaussian Kernel">
+            <img src="results/gaussian_kernel.png" alt="2D Gaussian Kernel" />
           </div>
           <div class="img-row">
-            <img src="results/grad_dxdy.png" alt="Dx, Dy and Gradient magnitude after Gaussian smoothing" style="max-width: 90%;">
+            <img src="results/grad_dxdy.png" alt="Dx, Dy and Gradient magnitude after Gaussian smoothing" style="max-width: 90%;" />
           </div>
 
           <p>
-            Compared with the unsmoothed gradient images, the smoothed gradients are much less noisy: 
-            small texture variations are suppressed while main edges become clearer. 
-            Using derivative of Gaussian (DoG) filters combines smoothing and differentiation in a 
-            single convolution step.
+            Compared with the unsmoothed gradient images, the smoothed gradients are much less noisy: small texture variations are suppressed while main edges become clearer. Using derivative of Gaussian (DoG) filters combines smoothing and differentiation in a single convolution step.
           </p>
 
           <div class="img-row">
-            <img src="results/dog_filter_dxdy.png" alt="DoG filter Dx, Dy" style="max-width: 80%;">
+            <img src="results/dog_filter_dxdy.png" alt="DoG filter Dx, Dy" style="max-width: 80%;" />
           </div>
           <div class="img-row">
-            <img src="results/grad_magnitude_dog.png" alt="Gradient magnitude via DoG">
+            <img src="results/grad_magnitude_dog.png" alt="Gradient magnitude via DoG" />
           </div>
 
-          <p>
-            You can verify that applying the DoG filters directly to the original image produces the 
-            same results as smoothing first and then computing derivatives.
-          </p>
+          <p>You can verify that applying the DoG filters directly to the original image produces the same results as smoothing first and then computing derivatives.</p>
         </section>
 
         <!-- Part 2 -->
@@ -332,83 +303,52 @@ plt.show()
           <h3>2.1 Image Sharpening (Unsharp Masking)</h3>
           <p>We apply unsharp masking, which can be expressed as:</p>
           <p><code>sharpened = original + α * (original - blurred)</code></p>
-          <p>
-            A Gaussian filter produces the blurred version. Subtracting it from the original extracts 
-            high frequencies. By adding these back, scaled by α, the image becomes sharper. Below we 
-            compare the results:
-          </p>
+          <p>A Gaussian filter produces the blurred version. Subtracting it from the original extracts high frequencies. By adding these back, scaled by α, the image becomes sharper. Below we compare the results:</p>
 
           <div class="img-row">
-            <img src="results/taj.png" alt="Taj" style="max-width: 90%;">
+            <img src="results/taj.png" alt="Taj" style="max-width: 90%;" />
           </div>
 
           <p>Another test on a picture of my cat Coconut:</p>
 
           <div class="img-row">
-            <img src="results/mycat1.png" alt="My Cat Coconut" style="max-width: 90%;">
+            <img src="results/mycat1.png" alt="My Cat Coconut" style="max-width: 90%;" />
           </div>
 
-          <p>
-            <b>Observations:</b> The sharpened images show clearer edges and textures, though 
-            excessive α can introduce artifacts.
-          </p>
+          <p><b>Observations:</b> The sharpened images show clearer edges and textures, though excessive α can introduce artifacts.</p>
 
           <h3>2.2 Hybrid Images</h3>
-          <p>
-            The idea of hybrid images is to combine the low-frequency (blurred) part of one image 
-            with the high-frequency (edge/detail) part of another. At close viewing distance, the 
-            high frequencies dominate perception, so you mainly see image A. From far away, the high 
-            frequencies fade, and the low frequencies dominate, so you perceive image B.
-          </p>
+          <p>The idea of hybrid images is to combine the low-frequency (blurred) part of one image with the high-frequency (edge/detail) part of another. At close viewing distance, the high frequencies dominate perception, so you mainly see image A. From far away, the high frequencies fade, and the low frequencies dominate, so you perceive image B.</p>
 
-          <p>
-            Process: keep high frequencies of image A (<code>original - gaussian(A)</code>), 
-            take low frequencies of image B (<code>gaussian(B)</code>), and add them together. 
-            This produces a hybrid image that changes interpretation with viewing distance. 
-          </p>
+          <p>Process: keep high frequencies of image A (<code>original - gaussian(A)</code>), take low frequencies of image B (<code>gaussian(B)</code>), and add them together. This produces a hybrid image that changes interpretation with viewing distance.</p>
 
           <div class="img-row">
-            <img src="results/motorcycle.png" alt="Hybrid bicycle and motorcycle" style="max-width: 90%;">
+            <img src="results/motorcycle.png" alt="Hybrid bicycle and motorcycle" style="max-width: 90%;" />
           </div>
 
-          <p>
-            <b>Fourier Analysis:</b> Below are the log magnitude Fourier transforms of the two inputs, 
-            the filtered images, and the hybrid image. These confirm that one contributes mostly low 
-            frequencies and the other mostly high frequencies.
-          </p>
+          <p><b>Fourier Analysis:</b> Below are the log magnitude Fourier transforms of the two inputs, the filtered images, and the hybrid image. These confirm that one contributes mostly low frequencies and the other mostly high frequencies.</p>
 
           <div class="img-row">
-            <img src="results/berryfish.png" alt="Hybrid red fish with strawberry" style="max-width: 90%;">
+            <img src="results/berryfish.png" alt="Hybrid red fish with strawberry" style="max-width: 90%;" />
           </div>
 
-          <p>
-            I also created multiple hybrid examples (e.g., change of expression, my cat growing 
-            older(eating a lot).
-          </p>
+          <p>I also created multiple hybrid examples (e.g., change of expression, my cat growing older(eating a lot)).</p>
 
           <div class="img-row">
-            <img src="results/smile.png" alt="Hybrid expressions" style="max-width: 90%;">
-            <img src="results/coconut.png" alt="Hybrid images when Coconut was young and now" style="max-width: 90%;">
+            <img src="results/smile.png" alt="Hybrid expressions" style="max-width: 90%;" />
+            <img src="results/coconut.png" alt="Hybrid images when Coconut was young and now" style="max-width: 90%;" />
           </div>
         </section>
 
         <!-- Part 2.3 / 2.4 -->
         <section id="multires" class="card">
-          <h2>Part 2.3/2.4: Gaussian & Laplacian Stacks + Multiresolution Blending</h2>
-          <p>
-            Implement <strong>stacks (no downsampling)</strong> for Gaussian and Laplacian. 
-            Use a Gaussian stack of the mask for blending. Reproduce the classic “oraple” (half apple, 
-            half orange) and experiment with vertical/horizontal seams and irregular masks.
-          </p>
+          <h2>Part 2.3/2.4: Gaussian &amp; Laplacian Stacks + Multiresolution Blending</h2>
 
-          <h3>Gaussian & Laplacian Stacks (no downsampling)</h3>
+          <p>Implement <strong>stacks (no downsampling)</strong> for Gaussian and Laplacian. Use a Gaussian stack of the mask for blending. Reproduce the classic “oraple” (half apple, half orange) and experiment with vertical/horizontal seams and irregular masks.</p>
+
+          <h3>Gaussian &amp; Laplacian Stacks (no downsampling)</h3>
           <p>
-            A <strong>stack</strong> is similar to a pyramid but every level has the same spatial size 
-            as the original image; only the amount of Gaussian smoothing increases at each level. To 
-            build a Gaussian stack, repeatedly blur the image (increasing the effective sigma each 
-            level) and store each blurred image. The Laplacian stack is formed by taking the 
-            difference between successive Gaussian levels (L[i] = G[i] - G[i+1]) with the last level 
-            equal to G[N].
+            A <strong>stack</strong> is similar to a pyramid but every level has the same spatial size as the original image; only the amount of Gaussian smoothing increases at each level. To build a Gaussian stack, repeatedly blur the image (increasing the effective sigma each level) and store each blurred image. The Laplacian stack is formed by taking the difference between successive Gaussian levels (L[i] = G[i] - G[i+1]) with the last level equal to G[N].
           </p>
 
           <details>
@@ -430,12 +370,7 @@ Reconstruct by summing blended levels
           </details>
 
           <h3>Multiresolution Blending (the Oraple)</h3>
-          <p>
-            Use a mask (step function for a straight seam, or an irregular mask for creative blends). 
-            Build a Gaussian stack for the mask as well; this smooths the seam differently at each 
-            frequency band and prevents visible seams when you reconstruct the image from the blended 
-            Laplacian stack.
-          </p>
+          <p>Use a mask (step function for a straight seam, or an irregular mask for creative blends). Build a Gaussian stack for the mask as well; this smooths the seam differently at each frequency band and prevents visible seams when you reconstruct the image from the blended Laplacian stack.</p>
 
           <p>Workflow summary:</p>
           <ol>
@@ -447,61 +382,45 @@ Reconstruct by summing blended levels
           </ol>
 
           <div class="img-row">
-            <img src="results/orange.png" alt="apple/orange inputs & oraple result(placeholder)" style="max-width:90%">
+            <img src="results/orange.png" alt="apple/orange inputs & oraple result(placeholder)" style="max-width:90%" />
           </div>
 
-          <p>
-            Below are example results: the input pair, the blended result, and a visualization of 
-            Laplacian bands for the chosen levels.
-          </p>
+          <p>Below are example results: the input pair, the blended result, and a visualization of Laplacian bands for the chosen levels.</p>
 
           <div class="img-row">
             <figure>
-              <img src="results/flowerman.jpg" alt="blending flowers with dresses" style="max-width:90%">
+              <img src="results/flowerman.jpg" alt="blending flowers with dresses" style="max-width:90%" />
               <figcaption>Horizontal seam blending: flower head smoothly merged with a dress.</figcaption>
             </figure>
             <figure>
-              <img src="results/starhill.png" alt="Blending van Gogh's paintings with hills" style="max-width:90%">
+              <img src="results/starhill.png" alt="Blending van Gogh's paintings with hills" style="max-width:90%" />
               <figcaption>Diagonal seam blending: van Gogh's starry sky gradually transitions into hills.</figcaption>
             </figure>
             <figure>
-              <img src="results/eyeflower.png" alt="Blending sunflower with an eye" style="max-width:90%">
+              <img src="results/eyeflower.png" alt="Blending sunflower with an eye" style="max-width:90%" />
               <figcaption>Irregular (circular) mask blending: an eye inside the sunflower center.</figcaption>
             </figure>
           </div>
 
-          <p>
-            <b>Conclusion:</b> Multiresolution blending allows seamless merges of images even with 
-            complex masks. The Gaussian mask stack ensures smooth transitions at multiple scales.
-          </p>
+          <p><b>Conclusion:</b> Multiresolution blending allows seamless merges of images even with complex masks. The Gaussian mask stack ensures smooth transitions at multiple scales.</p>
         </section>
+
       </main>
-
-      <aside>
-        <div class="card">
-          <h3>Project Notes</h3>
-          <ul>
-            <li>Convolutions implemented manually (4 loops, 2 loops).</li>
-            <li>Edge detection via finite difference and DoG.</li>
-            <li>Sharpening via unsharp masking.</li>
-            <li>Hybrid images (high+low frequencies).</li>
-            <li>Multiresolution blending (Gaussian/Laplacian stacks).</li>
-          </ul>
-        </div>
-
-        <div class="card">
-          <h3>References</h3>
-          <ul>
-            <li>Oppenheim &amp; Lim (1981) – The Oraple.</li>
-            <li>Szeliski – Computer Vision: Algorithms and Applications.</li>
-            <li>Gonzalez &amp; Woods – Digital Image Processing.</li>
-          </ul>
-        </div>
-      </aside>
     </div>
 
-    <footer>
-      <p>Project by Coconut's Owner | CS180 Homework</p>
+    <footer style="margin-top:22px;">
+      <div class="card">
+        <h3>Project Notes &amp; References</h3>
+        <p>Project by Coconut's Owner | CS180 Homework</p>
+        <ul>
+          <li>Convolutions implemented manually (4 loops, 2 loops).</li>
+          <li>Edge detection via finite difference and DoG.</li>
+          <li>Sharpening via unsharp masking.</li>
+          <li>Hybrid images (high+low frequencies).</li>
+          <li>Multiresolution blending (Gaussian/Laplacian stacks).</li>
+        </ul>
+        <p>References: Oppenheim &amp; Lim; Szeliski; Gonzalez &amp; Woods; Burt &amp; Adelson (1983)</p>
+      </div>
     </footer>
   </div>
 </body>
