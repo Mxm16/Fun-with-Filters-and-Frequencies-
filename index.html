@@ -380,27 +380,43 @@ In summary, Gaussian smoothing significantly reduces noise compared with the sim
 
 
           
-          <h3>2.2 Hybrid Images</h3>
-          <p>The idea of hybrid images is to combine the low-frequency (blurred) part of one image with the high-frequency (edge/detail) part of another. At close viewing distance, the high frequencies dominate perception, so you mainly see image A. From far away, the high frequencies fade, and the low frequencies dominate, so you perceive image B.</p>
+<h3>2.2 Hybrid Images</h3>
+<p>The idea of hybrid images is to combine the low-frequency (blurred) part of one image with the high-frequency (edge/detail) part of another. At close viewing distance, the high frequencies dominate perception, so you mainly see image A. From far away, the high frequencies fade, and the low frequencies dominate, so you perceive image B.</p>
 
-          <p>Process: keep high frequencies of image A (<code>original - gaussian(A)</code>), take low frequencies of image B (<code>gaussian(B)</code>), and add them together. This produces a hybrid image that changes interpretation with viewing distance.</p>
+<h4>Example 1: Derek + Nutmeg</h4>
+<p>
+For this hybrid, I show the <b>entire process in one composite figure</b>:
+original and aligned inputs, their Fourier transforms, the filtered results, the chosen cutoff frequency (σ = 4), and the final hybrid.  
+The cutoff was chosen to preserve Derek’s smooth face while emphasizing Nutmeg’s high-frequency details.
+</p>
 
-          <div class="img-row">
-            <img src="results/motorcycle.png" alt="Hybrid bicycle and motorcycle" style="max-width: 90%;" />
-          </div>
+<div class="img-row">
+  <img src="results/nutmeg.jpg" alt="Derek + Nutmeg full process" style="max-width: 95%;" />
+</div>
 
-          <p><b>Fourier Analysis:</b> Below are the log magnitude Fourier transforms of the two inputs, the filtered images, and the hybrid image. These confirm that one contributes mostly low frequencies and the other mostly high frequencies.</p>
+<hr>
 
-          <div class="img-row">
-            <img src="results/berryfish.png" alt="Hybrid red fish with strawberry" style="max-width: 90%;" />
-          </div>
+<h4>Example 2: Motorcycle + Bicycle</h4>
+<p>Process: keep high frequencies of motorcycle, low frequencies of bicycle, and combine them into a hybrid.</p>
+<p><b>Fourier Analysis:</b> Below are the log magnitude Fourier transforms of the two inputs, the filtered images, and the hybrid image. These confirm that one contributes mostly low frequencies and the other mostly high frequencies.</p>
 
-          <p>I also created multiple hybrid examples (e.g., change of expression, my cat growing older(eating a lot)).</p>
+<div class="img-row">
+  <img src="results/motorcycle.png" alt="Hybrid bicycle and motorcycle" style="max-width: 90%;" />
+  <img src="results/motorcycle2.png" alt="Hybrid bicycle and motorcycle" style="max-width: 90%;" />
+</div>
 
-          <div class="img-row">
-            <img src="results/smile.png" alt="Hybrid expressions" style="max-width: 90%;" />
-            <img src="results/coconut.png" alt="Hybrid images when Coconut was young and now" style="max-width: 90%;" />
-          </div>
+<div class="img-row">
+  <img src="results/berryfish.png" alt="Hybrid red fish with strawberry" style="max-width: 90%;" />
+  <img src="results/berryfish2.png" alt="Hybrid red fish with strawberry" style="max-width: 90%;" />
+</div>
+
+<h4>Example 3: Other Hybrids</h4>
+<p>I also created multiple hybrid examples (e.g., change of expression, my cat growing older (eating a lot)).</p>
+
+<div class="img-row">
+  <img src="results/smile.png" alt="Hybrid expressions" style="max-width: 90%;" />
+  <img src="results/coconut.png" alt="Hybrid images when Coconut was young and now" style="max-width: 90%;" />
+</div>
         </section>
 
         <!-- Part 2.3 / 2.4 -->
