@@ -356,7 +356,6 @@ Alternatively, construct DoG filters by convolving the Gaussian kernel <code>G</
 
 <p>
 Gaussian smoothing significantly reduces noise compared with the simple finite difference method, and the DoG filters combine smoothing and differentiation in a single convolution. This approach is more efficient and confirms that Gaussian smoothing and differentiation are commutative.
-<b>Compared with the finite difference results, the smoothed and DoG-based gradients produce cleaner edges, with less sensitivity to small fluctuations and noise in flat regions.</b>
 </p>
 
         <!-- Part 2 -->
@@ -364,7 +363,6 @@ Gaussian smoothing significantly reduces noise compared with the simple finite d
           <h2>Part 2: Fun with Frequencies</h2>
 
 <h3>2.1 Image Sharpening (Unsharp Masking)</h3>
-<p>We apply unsharp masking, expressed as:</p>
 <p><code>sharpened = original + α * (original - blurred)</code></p>
 <p>A Gaussian filter produces the blurred version. Subtracting it from the original extracts high frequencies, which are then scaled by α and added back to enhance edges and details. Below we show the comparison for the Taj Mahal image:</p>
 
@@ -375,7 +373,7 @@ Gaussian smoothing significantly reduces noise compared with the simple finite d
           <p>Another test on a picture of my cat Coconut:</p>
 
           <div class="img-row">
-            <img src="results/mycat1.png" alt="My Cat Coconut" style="max-width: 90%;" />
+            <img src="results/mycat2.png" alt="My Cat Coconut" style="max-width: 90%;" />
           </div>
 
 <p><b>Observations:</b> The sharpened images show clearer edges and textures. Increasing α enhances sharpness but too large a value may introduce visible artifacts or unnatural contrast.</p>
@@ -383,12 +381,11 @@ Gaussian smoothing significantly reduces noise compared with the simple finite d
 
           
 <h3>2.2 Hybrid Images</h3>
-<p>The idea of hybrid images is to combine the low-frequency (blurred) part of one image with the high-frequency (edge/detail) part of another. At close viewing distance, the high frequencies dominate perception, so you mainly see image A. From far away, the high frequencies fade, and the low frequencies dominate, so you perceive image B.</p>
+<p>The idea of hybrid images is to combine the low-frequency (blurred) part of one image with the high-frequency (edge/detail) part of another. At close viewing distance, the high frequencies dominate perception, so we see image A. From far away, the high frequencies fade, and the low frequencies dominate, so we see image B.</p>
 
 <h4>Example 1: Derek + Nutmeg</h4>
 <p>
-For this hybrid, I show the <b>entire process in one composite figure</b>:
-original and aligned inputs, their Fourier transforms, the filtered results, the chosen cutoff frequency (σ = 4), and the final hybrid.  
+For this hybrid, I show the original and aligned inputs, their Fourier transforms, the filtered results, the chosen cutoff frequency (σ = 4), and the final hybrid.  
 The cutoff was chosen to preserve Derek’s smooth face while emphasizing Nutmeg’s high-frequency details.
 </p>
 
@@ -399,8 +396,7 @@ The cutoff was chosen to preserve Derek’s smooth face while emphasizing Nutmeg
 <hr>
 
 <h4>Example 2 & 3: Motorcycle + Bicycle & Strawberry + fish</h4>
-<p>Process: keep high frequencies of motorcycle, low frequencies of bicycle, and combine them into a hybrid.</p>
-<p><b>Fourier Analysis:</b> Below are the log magnitude Fourier transforms of the two inputs, the filtered images, and the hybrid image. These confirm that one contributes mostly low frequencies and the other mostly high frequencies.</p>
+<p>Process: keep high frequencies of motorcycle/strawberry, low frequencies of bicycle/fish, and combine them into a hybrid.</p>
 
 <div class="img-row">
   <img src="results/motorcycle.png" alt="Hybrid bicycle and motorcycle" style="max-width: 90%;" />
@@ -424,9 +420,6 @@ The cutoff was chosen to preserve Derek’s smooth face while emphasizing Nutmeg
         <!-- Part 2.3 / 2.4 -->
         <section id="multires" class="card">
           <h2>Part 2.3/2.4: Gaussian &amp; Laplacian Stacks + Multiresolution Blending</h2>
-
-          <p>Implement <strong>stacks (no downsampling)</strong> for Gaussian and Laplacian. Use a Gaussian stack of the mask for blending. Reproduce the classic “oraple” (half apple, half orange) and experiment with vertical/horizontal seams and irregular masks.</p>
-
           <h3>Gaussian &amp; Laplacian Stacks (no downsampling)</h3>
           <p>
             A <strong>stack</strong> is similar to a pyramid but every level has the same spatial size as the original image; only the amount of Gaussian smoothing increases at each level. To build a Gaussian stack, repeatedly blur the image (increasing the effective sigma each level) and store each blurred image. The Laplacian stack is formed by taking the difference between successive Gaussian levels (L[i] = G[i] - G[i+1]) with the last level equal to G[N].
@@ -451,16 +444,9 @@ Reconstruct by summing blended levels
           </details>
 
           <h3>Multiresolution Blending (the Oraple)</h3>
-          <p>Use a mask (step function for a straight seam, or an irregular mask for creative blends). Build a Gaussian stack for the mask as well; this smooths the seam differently at each frequency band and prevents visible seams when you reconstruct the image from the blended Laplacian stack.</p>
-
-          <p>Workflow summary:</p>
-          <ol>
-            <li>Read and (optionally) align / resize both images to the same dimensions.</li>
-            <li>Build Gaussian stacks for image A, image B, and the mask.</li>
-            <li>Form Laplacian stacks for A and B by subtracting successive Gaussian levels.</li>
-            <li>At each level, blend Laplacian bands using the Gaussian-smoothed mask.</li>
-            <li>Reconstruct the final image by summing blended Laplacian levels from coarse to fine.</li>
-          </ol>
+          <p>
+          In this approach, each level of the stack maintains the original image size, with increasing Gaussian smoothing at higher levels. The Laplacian stack is obtained by taking differences between successive Gaussian levels, with the final level equal to the most blurred Gaussian image. For blending, the Laplacian bands from two images are combined at each level using a Gaussian-smoothed mask, and the final blended image is reconstructed by summing all levels from coarse to fine.
+          </p>
 
           <div class="img-row">
             <img src="results/orange.png" alt="apple/orange inputs & oraple result(placeholder)" style="max-width:90%" />
@@ -483,27 +469,10 @@ Reconstruct by summing blended levels
             </figure>
           </div>
 
-          <p><b>Conclusion:</b> Multiresolution blending allows seamless merges of images even with complex masks. The Gaussian mask stack ensures smooth transitions at multiple scales.</p>
         </section>
 
       </main>
     </div>
-
-    <footer style="margin-top:22px;">
-      <div class="card">
-        <h3>Project Notes &amp; References</h3>
-        <p>Project by Coconut's Owner | CS180 Homework</p>
-        <ul>
-          <li>Convolutions implemented manually (4 loops, 2 loops).</li>
-          <li>Edge detection via finite difference and DoG.</li>
-          <li>Sharpening via unsharp masking.</li>
-          <li>Hybrid images (high+low frequencies).</li>
-          <li>Multiresolution blending (Gaussian/Laplacian stacks).</li>
-        </ul>
-        <p>References: Oppenheim &amp; Lim; Szeliski; Gonzalez &amp; Woods; Burt &amp; Adelson (1983)</p>
-      </div>
-    </footer>
-  </div>
 </body>
 </html>
 
