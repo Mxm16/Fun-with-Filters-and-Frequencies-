@@ -66,13 +66,17 @@
       margin-top: 0;
     }
 
-    pre {
-      background: #0b1220;
-      color: #d1e8ff;
-      padding: 12px;
-      border-radius: 8px;
-      overflow: auto;
-    }
+  pre {
+    background: #0b1220;       /* 深色背景 */
+    color: #d1e8ff;           /* 浅色文字 */
+    padding: 12px;
+    border-radius: 8px;
+    font-family: monospace;   /* 等宽字体 */
+    white-space: pre-wrap;    /* 自动换行，同时保留缩进 */
+    word-break: break-word;   /* 避免长行溢出 */
+    overflow-x: hidden;       /* 禁止横向滚动条 */
+  }
+
 
     code {
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', 'Courier New', monospace;
