@@ -66,8 +66,15 @@
       margin-top: 0;
     }
 
-    pre { background: #0b1220; color: #d1e8ff; padding: 12px; border-radius: 8px; overflow: visible; }
-
+    pre {
+    background: #0b1220;
+    color: #d1e8ff;
+    padding: 12px;
+    border-radius: 8px;
+    overflow: visible;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
 
     code {
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', 'Courier New', monospace;
@@ -96,14 +103,13 @@
       color: #92400e;
     }
 
-    .code-box {
-      background: #0b1220;
-      border-radius: 8px;
-      padding: 10px;
-      margin: 10px 0;
-      max-height: 360px;
-      overflow: visible;
-    }
+  .code-box {
+    background: #0b1220;
+    border-radius: 8px;
+    padding: 10px;
+    margin: 10px 0;
+    overflow: visible;
+  }
 
     .code-box pre {
       margin: 0;
