@@ -425,23 +425,20 @@ The cutoff was chosen to preserve Derek’s smooth face while emphasizing Nutmeg
             A <strong>stack</strong> is similar to a pyramid but every level has the same spatial size as the original image; only the amount of Gaussian smoothing increases at each level. To build a Gaussian stack, repeatedly blur the image (increasing the effective sigma each level) and store each blurred image. The Laplacian stack is formed by taking the difference between successive Gaussian levels (L[i] = G[i] - G[i+1]) with the last level equal to G[N].
           </p>
 
-          <details>
-            <summary>Core pseudo-code</summary>
-            <pre><code># Gaussian stack
-G[0] = img
-for i in 1..N:
-    G[i] = gaussian_filter(G[i-1], sigma_i)
-
-# Laplacian stack
-L[i] = G[i] - G[i+1]
-L[N] = G[N]
-
-# Blending with mask
-for each level:
-   blended = mask_gauss[level] * L1[level] + (1-mask_gauss[level]) * L2[level]
-Reconstruct by summing blended levels
-</code></pre>
-          </details>
+    <pre><code># Gaussian stack
+    G[0] = img
+    for i in 1..N:
+        G[i] = gaussian_filter(G[i-1], sigma_i)
+    
+    # Laplacian stack
+    L[i] = G[i] - G[i+1]
+    L[N] = G[N]
+    
+    # Blending with mask
+    for each level:
+       blended = mask_gauss[level] * L1[level] + (1-mask_gauss[level]) * L2[level]
+    Reconstruct by summing blended levels
+    </code></pre>
 
           <h3>Multiresolution Blending (the Oraple)</h3>
           <p>
